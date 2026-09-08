@@ -275,61 +275,144 @@ List<T>::List() {
 template<typename T>
 List<T>::List(const List<T> &other) {
     // TODO: crear la nueva lista, como una copia independiente de other
+    this->head = nullptr;
+    this->tail = nullptr;
+    this->size = 0;
+
+    Node *actual = other.head;
+    while (actual != nullptr) {
+        this->insert_tail(actual->value); //insert_tail hace New Nodo() por c/u.
+        actual = actual->next;
+    }
 }
 
 template<typename T>
 List<T> &List<T>::operator=(const List<T> &other) {
     // TODO: reemplazar la lista actual con una copia independiente de other
     // La memoria anterior no debe perderse, sino liberarse correctamente
+    if (this == &other) { //si other  = this, liberar los nodos de this, tambien seria liberar los de other.
+        return *this; //y desp al leerlos igual, seria memoria invalida.
+    }
+    Node *actual = this->head;
+    while (actual != nullptr) {
+        Node *siguiente = actual->next;
+        delete actual;
+        actual = siguiente;
+    }
+    this->head = nullptr;
+    this->tail = nullptr;
+    this->size = 0;
+
+    actual = other.head;
+    while (actual != nullptr) {
+        this->insert_tail(actual->value);
+        actual = actual->next;
+    }
+    return *this;
 }
 
 template<typename T>
 List<T>::~List() {
     // TODO: liberar todos los nodos que queden con delete.
+    Node *actual = this->head; 
+    while (actual != nullptr) {
+        Node *siguiente = actual->next;
+        delete actual;
+        actual = siguiente
+    }
 }
 
 template<typename T>
 bool List<T>::is_empty() const {
     // TODO: devolver si la lista está vacía.
-    return true;
+    if (this->size =0) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 template<typename T>
 size_t List<T>::length() const {
     // TODO: devolver la cantidad de elementos.
-    return 0;
+    return this->size;
 }
 
 template<typename T>
 void List<T>::insert_head(const T& value) {
     // TODO: reservar un nodo con new, enlazarlo al principio y
     // actualizar head/tail/size.
+    Node *nuevo = new Node (value);
+    nuevo->prev = nullptr;
+    nuevo->next = this->head;
+    if (this->head !=nullptr) { //ya habia al menos un elemento, el viejo head pasa a tener como anterior al nuevo. 
+        this->head->prev =nuevo;
+    } else { //la lista esta vacia, el nuevo nodo es head y tail.
+        this->tail =nuevo; 
+    }
+    this->head = nuevo;
+    this->size ++;
+
 }
 
 template<typename T>
 void List<T>::insert_tail(const T& value) {
     // TODO: reservar un nodo con new, enlazarlo al final y
     // actualizar head/tail/size.
+    Node *nuevo = new Node(value);
+    nuevo->next = nullptr;
+    nuevo->prev = this->tail;
+    if (this->tail != nullptr) {
+        this->tail->next =nuevo;
+    } else {
+        this->head = nuevo;
+    }
+    this->tail =nuevo;
+    this->size ++;
 }
 
 template<typename T>
 T List<T>::pop_head() {
     // TODO: sacar el primer nodo (con delete), devolver su valor.
+    Node *viejo =this->head;
+    T valor = viejo->value;
+    this->head = viejo->next;
+    if (this->head != nullptr) {
+        this->head->prev = nullptr;
+    } else {
+        this->tail =nullptr;
+    }
+    delete viejo;
+    this->size --;
+    return valor; 
 }
 
 template<typename T>
 T List<T>::pop_tail() {
     // TODO: sacar el último nodo (con delete), devolver su valor.
+    Node *viejo = this->tail;
+    T valor = viejo->value;
+    this->tail =viejo->prev;
+    if (this->tail != nullptr){
+        this->tail->next = nullptr;
+    } else {
+        this->head =nullptr;
+    }
+    delete viejo;
+    this->size --;
+    return valor;
 }
 
 template<typename T>
 const T& List<T>::peek_head() const {
     // TODO: devolver el valor del principio.
+    return this->head->value;
 }
 
 template<typename T>
 const T& List<T>::peek_tail() const {
     // TODO: devolver el valor del final.
+    return this->tail->value;
 }
 
 template <typename T>
